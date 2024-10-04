@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,44 +18,48 @@ import com.practice.spring_security.models.Product;
 import com.practice.spring_security.service.ProductService;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/product")
+@EnableMethodSecurity
 public class ProductController {
+
 	@Autowired
 	private ProductService productService;
-	
+
 	@GetMapping
-	public ResponseEntity<?> getAllProducts(){
-		return new ResponseEntity<>(productService.getAllProducts(),HttpStatus.OK);
+	@PreAuthorize("hasAuthority('User')")
+	public ResponseEntity<?> getAllProducts() {
+		return new ResponseEntity<>(productService.getAllProducts(), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/{id}")
-	public ResponseEntity<?> getProductById(@PathVariable int id){
-		Product product=productService.getProductById(id);
-		if(product!=null) {
-			return new ResponseEntity<>(product,HttpStatus.OK);
+	public ResponseEntity<?> getProductById(@PathVariable int id) {
+		Product product = productService.getProductById(id);
+		if (product != null) {
+			return new ResponseEntity<>(product, HttpStatus.OK);
 		}
 		return ResponseEntity.noContent().build();
 	}
-	
+
 	@PostMapping
-	
-	public ResponseEntity<?> addNewProduct(@RequestBody Product newProduct){
-		return new ResponseEntity<>(productService.addNewProduct(newProduct),HttpStatus.OK);
+	@PreAuthorize("hasAuthority('Admin')")
+	public ResponseEntity<?> addNewProduct(@RequestBody Product newProduct) {
+		Product product = productService.addNewProduct(newProduct);
+		return new ResponseEntity<>(product, HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/{id}")
-	public ResponseEntity<?> updateProductById(@PathVariable int id,@RequestBody Product product){
-		Product updatedProduct=productService.updateExProduct(id, product);
-		return new ResponseEntity<>(updatedProduct,HttpStatus.OK);
-	}
-	
-	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteProduct(@PathVariable int id){
-		boolean deleted=productService.deleteProductById(id);
-		if(deleted) {
-			return new ResponseEntity<>(true,HttpStatus.OK);
+	public ResponseEntity<?> updateProduct(@PathVariable int id, @RequestBody Product updatedProduct) {
+		Product updatedOne = productService.updateProduct(id, updatedProduct);
+		if (updatedOne != null) {
+			return new ResponseEntity<>(updatedOne, HttpStatus.OK);
 		}
-		return ResponseEntity.badRequest().build();
+		return null;
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> deleteProduct(@PathVariable int id) {
+		boolean deleted = productService.deleteProductById(id);
+		return new ResponseEntity<>(deleted, HttpStatus.OK);
 	}
 
 }

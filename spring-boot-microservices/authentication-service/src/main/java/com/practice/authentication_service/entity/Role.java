@@ -1,5 +1,6 @@
-package com.practice.spring_security.models;
+package com.practice.authentication_service.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
@@ -11,11 +12,9 @@ import lombok.NoArgsConstructor;
 @Data
 
 @Entity
-public class Product {
+public class Role {
 	@Id
+	@Column(name = "role_id")
 	private int id;
 	private String name;
-	private double price;
-	
-
 }

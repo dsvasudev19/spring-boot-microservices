@@ -1,16 +1,14 @@
 package com.practice.spring_security.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.practice.spring_security.models.Product;
-import com.practice.spring_security.repository.ProductRepository;
+import com.practice.spring_security.respository.ProductRepository;
 
-@SuppressWarnings("unused")
 @Service
 public class ProductService {
 	@Autowired
@@ -21,23 +19,23 @@ public class ProductService {
 	}
 
 	public Product getProductById(int id) {
-		Optional<Product> productOptional = productRepository.findById(id);
-		if (productOptional.isPresent()) {
-			return productOptional.get();
+		Product productFound = productRepository.findById(id).get();
+		if (productFound != null) {
+			return productFound;
 		}
 		return null;
 	}
 
-	public Product addNewProduct(Product newProduct) {
-		return productRepository.save(newProduct);
+	public Product addNewProduct(Product product) {
+		return productRepository.save(product);
 	}
 
-	public Product updateExProduct(int id, Product product) {
-		Optional<Product> productFound = productRepository.findById(id);
-		if (productFound.isPresent()) {
-			Product oldProduct = productFound.get();
-			BeanUtils.copyProperties(product, oldProduct);
-			return productRepository.saveAndFlush(oldProduct);
+	public Product updateProduct(int id, Product updatedProduct) {
+		Product productFound = productRepository.findById(id).get();
+		if (productFound != null) {
+			BeanUtils.copyProperties(updatedProduct, productFound);
+			productRepository.save(productFound);
+			return productFound;
 		}
 		return null;
 	}
@@ -46,5 +44,4 @@ public class ProductService {
 		productRepository.deleteById(id);
 		return true;
 	}
-
 }
